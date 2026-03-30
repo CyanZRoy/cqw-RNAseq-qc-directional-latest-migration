@@ -9,15 +9,14 @@ task fastqc {
 		set -o pipefail
 		set -e
 		nt=$(nproc)
-		fastqc -t $nt -o ./ ${read1}
-		fastqc -t $nt -o ./ ${read2}
+		fastqc -t $nt -o ./ ~{read1}
+		fastqc -t $nt -o ./ ~{read2}
 	>>>
 
 	runtime {
 		docker:docker
-    	cluster: cluster_config
-    	systemDisk: "cloud_ssd 40"
-    	dataDisk: "cloud_ssd " + disk_size + " /cromwell_root/"
+    	cluster: [cluster_config]
+    	systemDisk: "cloud " + disk_size
 	}
 	output {
 		File read1_html = sub(basename(read1), "\\.(fastq|fq)\\.gz$", "_fastqc.html")

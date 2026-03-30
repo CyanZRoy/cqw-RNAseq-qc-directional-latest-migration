@@ -7,19 +7,18 @@ task ballgown {
     String disk_size
 
     command <<<
-      mkdir -p /cromwell_root/tmp/${sample_id}
-      cp -r ${sep=" " ballgown} /cromwell_root/tmp/${sample_id}
-      ballgown /cromwell_root/tmp/${sample_id} ${sample_id}.txt
+		mkdir -p /cromwell_root/tmp/~{sample_id}
+		cp -r ~{sep=" " ballgown} /cromwell_root/tmp/~{sample_id}
+		ballgown /cromwell_root/tmp/~{sample_id} ~{sample_id}.txt
     >>>
     
     runtime {
       docker: docker
-      cluster: cluster
-      systemDisk: "cloud_ssd 40"
-      dataDisk: "cloud_ssd " + disk_size + " /cromwell_root/"
+      cluster: [cluster]
+      systemDisk: "cloud " + disk_size
     }
     
     output {
-      File mat_expression = "${sample_id}.txt"
+      File mat_expression = "~{sample_id}.txt"
     }
 }
