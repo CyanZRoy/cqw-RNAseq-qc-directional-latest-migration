@@ -34,7 +34,7 @@ task hisat2 {
    
    runtime { 
 		docker: docker 
-		cluster: [cluster]
+		instanceTypes: [cluster]
 		systemDisk: "cloud " + disk_size
 		timeout: 864000
    }

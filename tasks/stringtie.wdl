@@ -31,7 +31,7 @@ task stringtie {
     
     runtime {
       docker: docker
-      cluster: [cluster]
+      instanceTypes: [cluster]
       systemDisk: "cloud " + disk_size
     }
     

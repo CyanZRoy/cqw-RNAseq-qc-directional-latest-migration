@@ -17,7 +17,7 @@ task qualimapRNAseq {
 
 	runtime {
 		docker:docker
-		cluster: [cluster_config]
+		instanceTypes: [cluster_config]
 		systemDisk: "cloud " + disk_size
 	}
 
