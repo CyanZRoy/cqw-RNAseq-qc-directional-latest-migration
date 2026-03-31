@@ -14,11 +14,11 @@ task samtools {
     command <<<
 		set -o pipefail
 		set -e
-		/opt/conda/bin/samtools view -bS ~{sam} > ~{bam}
-		/opt/conda/bin/samtools sort -m 1000000000 ~{bam} -o ~{sorted_bam}
-		/opt/conda/bin/samtools index ~{sorted_bam}
-		/opt/conda/bin/samtools view -bs 42.1 ~{sorted_bam} > ~{percent_bam}
-		/opt/conda/bin/samtools stats -i ~{insert_size} ~{sorted_bam} |grep ^IS|cut -f 2- > ~{sample_id}.ins_size
+		/opt/conda/bin/samtools view -bS ${sam} > ${bam}
+		/opt/conda/bin/samtools sort -m 1000000000 ${bam} -o ${sorted_bam}
+		/opt/conda/bin/samtools index ${sorted_bam}
+		/opt/conda/bin/samtools view -bs 42.1 ${sorted_bam} > ${percent_bam}
+		/opt/conda/bin/samtools stats -i ${insert_size} ${sorted_bam} |grep ^IS|cut -f 2- > ${sample_id}.ins_size
     >>>
 
     runtime {

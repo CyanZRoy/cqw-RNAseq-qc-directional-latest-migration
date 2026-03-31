@@ -9,8 +9,8 @@ task fastqc {
 		set -o pipefail
 		set -e
 		nt=$(nproc)
-		fastqc -t $nt -o ./ ~{read1}
-		fastqc -t $nt -o ./ ~{read2}
+		fastqc -t $nt -o ./ ${read1}
+		fastqc -t $nt -o ./ ${read2}
 	>>>
 
 	runtime {

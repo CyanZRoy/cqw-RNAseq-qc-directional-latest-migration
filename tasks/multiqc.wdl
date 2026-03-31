@@ -21,14 +21,14 @@ task multiqc {
 		mkdir -p /cromwell_root/tmp/bamqc
 		mkdir -p /cromwell_root/tmp/rnaseq
 
-		cp ~{sep=" " read1_zip} ~{sep=" " read2_zip} /cromwell_root/tmp/fastqc
-		cp ~{sep=" " txt1} ~{sep=" " txt2} /cromwell_root/tmp/fastqscreen
-		for i in ~{sep=" " bamqc_zip}
+		cp ${sep=" " read1_zip} ${sep=" " read2_zip} /cromwell_root/tmp/fastqc
+		cp ${sep=" " txt1} ${sep=" " txt2} /cromwell_root/tmp/fastqscreen
+		for i in ${sep=" " bamqc_zip}
 		do
 		  tar -zxvf $i -C /cromwell_root/tmp/bamqc
 		done
 		
-		for i in ~{sep=" " rnaseq_zip}
+		for i in ${sep=" " rnaseq_zip}
 		do
 		  tar -zxvf $i -C /cromwell_root/tmp/rnaseq
 		done

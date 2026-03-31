@@ -18,18 +18,18 @@ task hisat2 {
    command <<<
 		nt=$(nproc)
 		hisat2 -t -p $nt \
-			-x ~{idx}/~{idx_prefix} \
-			--pen-cansplice ~{pen_cansplice} \
-			--pen-noncansplice ~{pen_noncansplice} \
-			--pen-canintronlen ~{pen_intronlen} \
-			--min-intronlen ~{min_intronlen} \
-			--max-intronlen ~{max_intronlen} \
-			--maxins ~{maxins} --minins ~{minins} \
+			-x ${idx}/${idx_prefix} \
+			--pen-cansplice ${pen_cansplice} \
+			--pen-noncansplice ${pen_noncansplice} \
+			--pen-canintronlen ${pen_intronlen} \
+			--min-intronlen ${min_intronlen} \
+			--max-intronlen ${max_intronlen} \
+			--maxins ${maxins} --minins ${minins} \
 			--rna-strandness RF \
-			--un-conc-gz ~{sample_id}_un.fq.gz \
-			-1 ~{Trim_R1} \
-			-2 ~{Trim_R2} \
-			-S ~{sample_id}.sam 
+			--un-conc-gz ${sample_id}_un.fq.gz \
+			-1 ${Trim_R1} \
+			-2 ${Trim_R2} \
+			-S ${sample_id}.sam 
    >>>
    
    runtime { 
@@ -40,8 +40,8 @@ task hisat2 {
    }
 
    output {
-      File sam = "~{sample_id}.sam"
-      File unmapread_1p = "~{sample_id}_un.fq.1.gz"
-      File unmapread_2p = "~{sample_id}_un.fq.2.gz"
+      File sam = "${sample_id}.sam"
+      File unmapread_1p = "${sample_id}_un.fq.1.gz"
+      File unmapread_2p = "${sample_id}_un.fq.2.gz"
    }
 }

@@ -7,9 +7,9 @@ task ballgown {
     String disk_size
 
     command <<<
-		mkdir -p /cromwell_root/tmp/~{sample_id}
-		cp -r ~{sep=" " ballgown} /cromwell_root/tmp/~{sample_id}
-		ballgown /cromwell_root/tmp/~{sample_id} ~{sample_id}.txt
+		mkdir -p /cromwell_root/tmp/${sample_id}
+		cp -r ${sep=" " ballgown} /cromwell_root/tmp/${sample_id}
+		ballgown /cromwell_root/tmp/${sample_id} ${sample_id}.txt
     >>>
     
     runtime {
@@ -19,6 +19,6 @@ task ballgown {
     }
     
     output {
-      File mat_expression = "~{sample_id}.txt"
+      File mat_expression = "${sample_id}.txt"
     }
 }
