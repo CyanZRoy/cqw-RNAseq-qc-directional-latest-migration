@@ -22,6 +22,5 @@ task qualimapBAMqc {
 
 	output {
 		File bamqc_zip = "${bamname}_bamqc_qualimap.tar.gz"
-		
 	}
 }
