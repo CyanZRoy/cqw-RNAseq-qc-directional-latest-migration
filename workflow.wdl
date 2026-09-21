@@ -37,9 +37,6 @@ workflow {{ project_name }} {
 	String samtools_cluster
 	String stringtie_docker
 	String stringtie_cluster
-	String multiqc_cluster_config
-	String multiqc_docker
-	Int multiqc_disk_size
 	Int trim_front1 
 	Int trim_tail1 
 	Int max_len1 
@@ -100,6 +97,7 @@ workflow {{ project_name }} {
 
 	call fastqc.fastqc as fastqc {
 		input:
+		sample_id = sample_id,
 		read1 = fastp.Trim_R1, 
 		read2 = fastp.Trim_R2,
 		docker = fastqc_docker,
@@ -109,6 +107,7 @@ workflow {{ project_name }} {
 
 	call fastqscreen.fastq_screen as fastqscreen {
 		input:
+		sample_id = sample_id,
 		read1 = fastp.Trim_R1, 
 		read2 = fastp.Trim_R2,
 		screen_ref_dir = screen_ref_dir,

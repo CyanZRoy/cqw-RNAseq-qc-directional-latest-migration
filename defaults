@@ -52,9 +52,6 @@
     "screen_ref_dir": "oss://reference-data/fastq_screen_reference/",
     "fastq_screen_conf": "oss://reference-data/fastq_screen_reference/fastq_screen.conf",
     "fastqscreen_disk_size": "200",
-    "multiqc_cluster_config": "ecs.c5.4xlarge",
-    "multiqc_docker": "crpi-xvcezojsbq275htp.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/multiqc:v1.8",
-    "multiqc_disk_size": "100",
     "ballgown_docker": "crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/pgx-ballgown:0.0.1",
     "ballgown_cluster": "ecs.e-c1m4.xlarge"
     }

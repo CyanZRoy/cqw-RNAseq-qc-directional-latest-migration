@@ -60,7 +60,7 @@ $ oss://choppy-cromwell-result/test-choppy/Your_project_name/
 
 ### 1.原始数据质量和数据比对质量
 
-#### [Fastqc](<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>) v0.11.5
+#### [Fastqc](<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>) 0.12.1
 
 FastQC是一个常用的测序原始数据的质控软件，主要包括12个模块，具体请参考[Fastqc模块详情](<https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/>)。
 
@@ -88,8 +88,10 @@ Qualimap是一个计算数据比对质量的软件，包含测序数据比对后
 
 ```bash
 qualimap bamqc -bam <bam_file> -outformat PDF:HTML -nt <threads> -outdir <output_directory> --java-mem-size=32G 
-qualimap rnaseq -bam ${bam} -outformat HTML -outdir ${bamname}_RNAseq -gtf ${gtf} -pe --java-mem-size=10G
+qualimap rnaseq -bam ${bam} -outformat HTML -outdir ${bamname}_RNAseq -gtf ${gtf} -pe --java-mem-size=32G
 ```
+
+为控制运行时间和资源消耗，两个 Qualimap 任务均使用 `samtools view -bs 42.1` 生成的固定随机种子 42、约 10% 下采样 BAM。Qualimap 报告中的覆盖度、GC、插入片段和外显子/内含子/基因间区等指标均为该 10% 抽样数据口径，不应与基于全量 BAM 的报告直接混用。
 
 ###2.数据表达质量
 
@@ -128,8 +130,8 @@ Rscript
 
 | 参数名                    | 参数解释                                                | 默认值                                                       |
 | ------------------------- | ------------------------------------------------------- | ------------------------------------------------------------ |
-| fastp_docker              | fastp软件版本信息                                       | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/fastp:0.19.6 |
-| fastp_cluster             | fastp软件使用服务器                                     | OnDemand bcs.b2.3xlarge img-ubuntu-vpc                       |
+| fastp_docker              | fastp软件版本信息                                       | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/fastp:0.19.6 |
+| fastp_cluster             | fastp软件使用服务器                                     | ecs.c5.4xlarge                                               |
 | trim_front1               | 修剪read1前面多少个碱基                                 | 0                                                            |
 | trim_tail1                | 修剪read1尾部有多少个碱基                               | 0                                                            |
 | max_len1                  | 修剪read1的尾部使其与max_len1一样长                     | 0                                                            |
@@ -153,11 +155,10 @@ Rscript
 
 | 参数名           | 参数解释                                                     | 默认值                                                       |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| hisat2_docker    | hisat2软件版本信息                                           | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/hisat2:v2.1.0-2 |
-| hisat2_cluster   | hisat2软件使用服务器                                         | OnDemand                                                     |
+| hisat2_docker    | hisat2软件版本信息                                           | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/hisat2:v2.1.0-2 |
+| hisat2_cluster   | hisat2软件使用服务器                                         | ecs.c5.4xlarge                                               |
 | idx_prefix       | 比对文件类型                                                 | genome_snp_tran                                              |
-| idx              | 比对文件地址                                                 | oss://pgx-reference-data/reference/hisat2/grch38_snp_tran/   |
-| fasta            | 比对文件名称                                                 | GRCh38.d1.vd1.fa                                             |
+| idx              | 比对文件地址                                                 | oss://reference-data/reference/hisat2/grch38_snp_tran/       |
 | pen_cansplice    | 为每对规范的剪接位点（例如GT  / AG）设置惩罚                 | 0                                                            |
 | pen_noncansplice | 设置每对非规范剪接位点（例如非GT  / AG）的惩罚               | 3                                                            |
 | pen_intronlen    | 设置长内含子的罚分，因此与较短的内含子相比，较短的内含子优先 | G,-8,1                                                       |
@@ -172,8 +173,8 @@ Rscript
 
 | 参数名           | 参数解释               | 默认值                                                       |
 | ---------------- | ---------------------- | ------------------------------------------------------------ |
-| samtools_docker  | samtools软件版本信息   | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/samtools:v1.3.1 |
-| samtools_cluster | samtools软件使用服务器 | OnDemand bcs.a2.large img-ubuntu-vpc,                        |
+| samtools_docker  | samtools软件版本信息   | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/samtools:v1.3.1 |
+| samtools_cluster | samtools软件使用服务器 | ecs.e-c1m4.xlarge                                            |
 | insert_size      | 最大插入读长           | 8000                                                         |
 
 
@@ -182,9 +183,9 @@ Rscript
 
 | 参数名                                               | 参数解释                                                     | 默认值                                                       |
 | ---------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| stringtie_docker                                     | stringtie软件版本信息                                        | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/stringtie:v1.3.4 |
-| stringtie_cluster                                    | stringtie软件使用服务器                                      | OnDemand bcs.a2.large img-ubuntu-vpc,                        |
-| gtf                                                  | 组装gtf文件地址                                              | oss://pgx-reference-data/reference/annotation/Homo_sapiens.GRCh38.93.gtf |
+| stringtie_docker                                     | stringtie软件版本信息                                        | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/stringtie:v1.3.4 |
+| stringtie_cluster                                    | stringtie软件使用服务器                                      | ecs.e-c1m4.xlarge                                            |
+| gtf                                                  | 组装gtf文件地址                                              | oss://reference-data/reference/annotation/Homo_sapiens.GRCh38.93.gtf |
 | minimum_length_allowed_for_the_predicted_transcripts | 设置预测成绩单所允许的最小长度                               | 200                                                          |
 | minimum_isoform_abundance                            | 将预测的转录本的最小同工型丰度设置为在给定基因座处组装的最丰富的转录本的一部分 | 0.01                                                         |
 | Junctions_no_spliced_reads                           | 没有拼接的接头在两端至少与该数量的碱基对齐，这些接头被过滤掉 | 10                                                           |
@@ -196,8 +197,8 @@ Rscript
 
 | 参数名                | 参数解释             | 默认值                                                       |
 | --------------------- | -------------------- | ------------------------------------------------------------ |
-| fastqc_cluster_config | fastqc软件使用服务器 | OnDemand bcs.b2.3xlarge img-ubuntu-vpc                       |
-| fastqc_docker         | fastqc软件版本信息   | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/fastqc:v0.11.5 |
+| fastqc_cluster_config | fastqc软件使用服务器 | ecs.c5.4xlarge                                               |
+| fastqc_docker         | fastqc软件版本信息   | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/fastqc:0.12.1--hdfd78af_0 |
 | fastqc_disk_size      | fastqc文件盘大小     | 150                                                          |
 
 
@@ -206,11 +207,11 @@ Rscript
 
 | 参数名                        | 参数解释                     | 默认值                                                       |
 | ----------------------------- | ---------------------------- | ------------------------------------------------------------ |
-| qualimapBAMqc_docker          | qualimapBAMqc软件版本信息    | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/qualimap:2.0.0 |
-| qualimapBAMqc_cluster_config  | qualimapBAMqc软件使用服务器  | OnDemand bcs.a2.7xlarge img-ubuntu-vpc                       |
+| qualimapBAMqc_docker          | qualimapBAMqc软件版本信息    | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/qualimap:2.0.0 |
+| qualimapBAMqc_cluster_config  | qualimapBAMqc软件使用服务器  | ecs.c5.4xlarge                                               |
 | qualimapBAMqc_disk_size       | qualimapBAMqc软件版本信息    | 500                                                          |
-| qualimapRNAseq_docker         | qualimapRNAseq软件版本信息   | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/qualimap:2.0.0 |
-| qualimapRNAseq_cluster_config | qualimapRNAseq软件使用服务器 | OnDemand bcs.a2.7xlarge img-ubuntu-vpc                       |
+| qualimapRNAseq_docker         | qualimapRNAseq软件版本信息   | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/qualimap:2.0.0 |
+| qualimapRNAseq_cluster_config | qualimapRNAseq软件使用服务器 | ecs.c5.4xlarge                                               |
 | qualimapRNAseq_disk_size      | qualimapRNAseq软件版本信息   | 500                                                          |
 
 
@@ -219,28 +220,44 @@ Rscript
 
 | 参数名                     | 参数解释                    | 默认值                                                       |
 | -------------------------- | --------------------------- | ------------------------------------------------------------ |
-| fastqscreen_docker         | fastqscreen软件版本信息     | registry.cn-shanghai.aliyuncs.com/pgx-docker-registry/fastqscreen:0.12.0 |
-| fastqscreen_cluster_config | fastqscreen软件使用服务器   | OnDemand bcs.b2.3xlarge img-ubuntu-vpc                       |
-| screen_ref_dir             | fastqscreen软件序列地址     | oss://pgx-reference-data/fastq_screen_reference/             |
-| fastq_screen_conf          | fastqscreen软件序列索引地址 | oss://pgx-reference-data/fastq_screen_reference/fastq_screen.conf |
+| fastqscreen_docker         | fastqscreen软件版本信息     | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/fastqscreen:0.12.0 |
+| fastqscreen_cluster_config | fastqscreen软件使用服务器   | ecs.c5.4xlarge                                               |
+| screen_ref_dir             | fastqscreen软件序列地址     | oss://reference-data/fastq_screen_reference/                 |
+| fastq_screen_conf          | fastqscreen软件序列索引地址 | oss://reference-data/fastq_screen_reference/fastq_screen.conf |
 | fastqscreen_disk_size      | fastqscreen文件盘大小       | 200                                                          |
-| ref_dir                    | fastqscreen序列索引地址     | oss://chinese-quartet/quartet-storage-data/reference_data/   |
 
+#### Ballgown
 
+| 参数名            | 参数解释                 | 默认值                                                       |
+| ----------------- | ------------------------ | ------------------------------------------------------------ |
+| ballgown_docker   | Ballgown 表达矩阵工具镜像 | crpi-xvcezojsbq275htp-vpc.cn-shanghai.personal.cr.aliyuncs.com/nap_hub/pgx-ballgown:0.0.1 |
+| ballgown_cluster  | Ballgown 软件使用服务器   | ecs.e-c1m4.xlarge                                            |
 
-#### [MultiQC](https://multiqc.info/)
+## 运行目录与日志
 
-| 参数名                 | 参数解释              | 默认值                                                       |
-| ---------------------- | --------------------- | ------------------------------------------------------------ |
-| multiqc_cluster_config | multiqc软件版本信息   | OnDemand bcs.b2.3xlarge img-ubuntu-vpc                       |
-| multiqc_docker         | multiqc软件使用服务器 | registry-vpc.cn-shanghai.aliyuncs.com/pgx-docker-registry/multiqc:v1.8 |
-| multiqc_disk_size      | multiqc文件盘大小     | 100                                                          |
+各 task 在 `/tmp/<sample>_<task>` 专属目录中执行，临时文件通过 `TMPDIR`、`TMP` 和 `TEMP` 指向该目录；完成后只把正式输出复制回 Cromwell call 目录。
+
+每个 task 都保留以下平台日志文件：
+
+- `script.txt`：平台实际执行的脚本；
+- `stdout.txt`：标准输出；
+- `stderr.txt`：标准错误。
+
+HISAT2 额外输出 `${sample_id}.hisat2_summary.txt`，其中保存 paired-end 比对汇总。查看唯一 concordant pair 比例时使用 `aligned concordantly exactly 1 time`，同时保留 HISAT2 原生 `overall alignment rate`；两者口径不同，不能互相替代。Samtools 额外保留 `${sample_id}.samtools.stats.txt`，便于后续整理比对和插入片段指标。
 
 
 
 ## App输出文件
 
-#### 1. results_upstream_total.csv
+#### 1. HISAT2 与 Samtools 结果日志
+
+- `${sample_id}.hisat2_summary.txt`：HISAT2 比对汇总和 overall alignment rate；
+- `${sample_id}.samtools.stats.txt`：完整 samtools stats；
+- `${sample_id}.ins_size`：由 samtools stats 提取的插入片段分布。
+
+#### 2. 上游质控汇总表（待后续实现）
+
+下表是历史 `results_upstream_total.csv` 的字段示例。当前 workflow 暂不自动生成该汇总表；待质控指标和业务口径确认后，再增加独立汇总 task。现阶段请使用各 task 原始输出以及上述 HISAT2/Samtools 结果日志。
 
 | library | date     | sample | replicate | Total.Sequences | GC_beforemapping | total_deduplicated_percentage | Human.percentage | ERCC.percentage | EColi.percentage | Adapter.percentage | Vector.percentage | rRNA.percentage | Virus.percentage | Yeast.percentage | Mitoch.percentage | Phix.percentage | No.hits.percentage | percentage_aligned_beforemapping | error_rate | bias_53 | GC_aftermapping | percent_duplicates | sequence_length | median_insert_size | mean_coverage | ins_size_median | ins_size_peak | exonic | intronic | intergenic |
 | ------- | -------- | ------ | --------- | --------------- | ---------------- | ----------------------------- | ---------------- | --------------- | ---------------- | ------------------ | ----------------- | --------------- | ---------------- | ---------------- | ----------------- | --------------- | ------------------ | -------------------------------- | ---------- | ------- | --------------- | ------------------ | --------------- | ------------------ | ------------- | --------------- | ------------- | ------ | -------- | ---------- |
@@ -301,9 +318,6 @@ Rscript
 | Correlation of  relative log2FC           | Two groups  | Pearson correlation between mean value  of reference relative ratio and test site. | [0.96,1]        |
 | Sensitivity of  DEGs                      | Two groups  | Sensitivity is the proportion of  "true" DEGs from reference dataset which can be correctly  identified as DEG by the test set. | [0.80, 1]       |
 | Specificity of  DEGs                      | Two groups  | Specificity is the proportion of  "true" not DEGs from reference dataset which can be can be  correctly identified as non-DEG by the test set. | [0.95, 1]       |
-
-
-
 
 
 

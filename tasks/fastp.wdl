@@ -23,35 +23,63 @@ task fastp {
     Int disable_quality_filtering
    
 	command <<<
-			nt=$(nproc)
-			mkdir -p /cromwell_root/tmp/fastp/
-					
-			##1.Disable_quality_filtering
-			if [ "${disable_quality_filtering}" == 0 ]
-			then
-			cp ${read1} /cromwell_root/tmp/fastp/{sample_id}_R1.fastq.tmp1.gz
-			cp ${read2} /cromwell_root/tmp/fastp/{sample_id}_R2.fastq.tmp1.gz
-			else
-			fastp --thread $nt --trim_front1 ${trim_front1} --trim_tail1 ${trim_tail1} --max_len1 ${max_len1} --trim_front2 ${trim_front2} --trim_tail2 ${trim_tail2} --max_len2 ${max_len2} -i ${read1} -I ${read2} -o /cromwell_root/tmp/fastp/${sample_id}_R1.fastq.tmp1.gz -O /cromwell_root/tmp/fastp/${sample_id}_R2.fastq.tmp1.gz -j ${sample_id}.json -h ${sample_id}.html
-			fi
+		set -e
+		call_dir="$PWD"
+		local_work="/tmp/${sample_id}_fastp"
+		copy_task_logs() {
+			cp -f "$call_dir/script" "$call_dir/script.txt" 2>/dev/null || true
+			cp -f "$call_dir/stdout" "$call_dir/stdout.txt" 2>/dev/null || true
+			cp -f "$call_dir/stderr" "$call_dir/stderr.txt" 2>/dev/null || true
+		}
+		trap copy_task_logs EXIT
 
-			##2.UMI
-			if [ "${UMI}" == 0 ]
-			then
-			cp /cromwell_root/tmp/fastp/${sample_id}_R1.fastq.tmp1.gz /cromwell_root/tmp/fastp/${sample_id}_R1.fastq.tmp2.gz
-			cp /cromwell_root/tmp/fastp/${sample_id}_R2.fastq.tmp1.gz /cromwell_root/tmp/fastp/${sample_id}_R2.fastq.tmp2.gz
-			else
-			fastp --thread $nt -U --umi_loc=${umi_loc} --umi_len=${umi_len} --trim_front1 ${trim_front1} --trim_tail1 ${trim_tail1} --max_len1 ${max_len1} --trim_front2 ${trim_front2} --trim_tail2 ${trim_tail2} --max_len2 ${max_len2} -i /cromwell_root/tmp/fastp/${sample_id}_R1.fastq.tmp1.gz -I /cromwell_root/tmp/fastp/${sample_id}_R2.fastq.tmp1.gz -o /cromwell_root/tmp/fastp/${sample_id}_R1.fastq.tmp2.gz -O /cromwell_root/tmp/fastp/${sample_id}_R2.fastq.tmp2.gz -j ${sample_id}.json -h ${sample_id}.html
-			fi
+		mkdir -p "$local_work/tmp"
+		export TMPDIR="$local_work/tmp"
+		export TMP="$TMPDIR"
+		export TEMP="$TMPDIR"
+		cd "$local_work"
+		nt=$(nproc)
 
-			##3.Trim
-			if [ "${disable_adapter_trimming}" == 0 ]
-			then
-			fastp --thread $nt -l ${length_required} -q ${qualified_quality_phred} -u ${length_required1} --adapter_sequence ${adapter_sequence} --adapter_sequence_r2 ${adapter_sequence_r2} --detect_adapter_for_pe --trim_front1 ${trim_front1} --trim_tail1 ${trim_tail1} --max_len1 ${max_len1} --trim_front2 ${trim_front2} --trim_tail2 ${trim_tail2} --max_len2 ${max_len2} -i /cromwell_root/tmp/fastp/${sample_id}_R1.fastq.tmp2.gz -I /cromwell_root/tmp/fastp/${sample_id}_R2.fastq.tmp2.gz -o ${sample_id}_R1.fastq.gz -O ${sample_id}_R2.fastq.gz -j ${sample_id}.json -h ${sample_id}.html
-			else
-			cp /cromwell_root/tmp/fastp/${sample_id}_R1.fastq.tmp2.gz ${sample_id}_R1.fastq.gz
-			cp /cromwell_root/tmp/fastp/${sample_id}_R2.fastq.tmp2.gz ${sample_id}_R2.fastq.gz
-			fi
+		quality_args="-q ${qualified_quality_phred} -u ${length_required1}"
+		if [ "${disable_quality_filtering}" -eq 0 ]; then
+			quality_args="--disable_quality_filtering"
+		fi
+
+		adapter_args="--adapter_sequence ${adapter_sequence} --adapter_sequence_r2 ${adapter_sequence_r2} --detect_adapter_for_pe"
+		if [ "${disable_adapter_trimming}" -ne 0 ]; then
+			adapter_args="--disable_adapter_trimming"
+		fi
+
+		umi_args=""
+		if [ "${UMI}" -ne 0 ]; then
+			umi_args="-U --umi_loc=${umi_loc} --umi_len=${umi_len}"
+		fi
+
+		fastp \
+			--thread "$nt" \
+			--trim_front1 ${trim_front1} \
+			--trim_tail1 ${trim_tail1} \
+			--max_len1 ${max_len1} \
+			--trim_front2 ${trim_front2} \
+			--trim_tail2 ${trim_tail2} \
+			--max_len2 ${max_len2} \
+			-l ${length_required} \
+			$quality_args \
+			$adapter_args \
+			$umi_args \
+			-i ${read1} \
+			-I ${read2} \
+			-o ${sample_id}_R1.fastq.gz \
+			-O ${sample_id}_R2.fastq.gz \
+			-j ${sample_id}.json \
+			-h ${sample_id}.html
+
+		cp -f \
+			${sample_id}_R1.fastq.gz \
+			${sample_id}_R2.fastq.gz \
+			${sample_id}.json \
+			${sample_id}.html \
+			"$call_dir/"
    >>>
    
    runtime { 

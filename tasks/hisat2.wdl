@@ -16,6 +16,22 @@ task hisat2 {
    Int minins
    
    command <<<
+		set -e
+		call_dir="$PWD"
+		local_work="/tmp/${sample_id}_hisat2"
+		copy_task_logs() {
+			cp -f "$call_dir/script" "$call_dir/script.txt" 2>/dev/null || true
+			cp -f "$call_dir/stdout" "$call_dir/stdout.txt" 2>/dev/null || true
+			cp -f "$call_dir/stderr" "$call_dir/stderr.txt" 2>/dev/null || true
+			cp -f "$local_work/${sample_id}.hisat2_summary.txt" "$call_dir/" 2>/dev/null || true
+		}
+		trap copy_task_logs EXIT
+
+		mkdir -p "$local_work/tmp"
+		export TMPDIR="$local_work/tmp"
+		export TMP="$TMPDIR"
+		export TEMP="$TMPDIR"
+		cd "$local_work"
 		nt=$(nproc)
 		hisat2 -t -p $nt \
 			-x ${idx}/${idx_prefix} \
@@ -29,7 +45,16 @@ task hisat2 {
 			--un-conc-gz ${sample_id}_un.fq.gz \
 			-1 ${Trim_R1} \
 			-2 ${Trim_R2} \
-			-S ${sample_id}.sam 
+			-S ${sample_id}.sam \
+			2> ${sample_id}.hisat2_summary.txt
+
+		cat ${sample_id}.hisat2_summary.txt >&2
+		cp -f \
+			${sample_id}.sam \
+			${sample_id}_un.fq.1.gz \
+			${sample_id}_un.fq.2.gz \
+			${sample_id}.hisat2_summary.txt \
+			"$call_dir/"
    >>>
    
    runtime { 
@@ -43,5 +68,6 @@ task hisat2 {
       File sam = "${sample_id}.sam"
       File unmapread_1p = "${sample_id}_un.fq.1.gz"
       File unmapread_2p = "${sample_id}_un.fq.2.gz"
+      File hisat2_summary = "${sample_id}.hisat2_summary.txt"
    }
 }

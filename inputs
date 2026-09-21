@@ -24,7 +24,6 @@
 	"{{ project_name }}.hisat2_cluster": "{{ hisat2_cluster }}",
 	"{{ project_name }}.idx_prefix": "{{ idx_prefix }}",
 	"{{ project_name }}.idx": "{{ idx }}",
-	"{{ project_name }}.fasta": "{{ fasta }}",
 	"{{ project_name }}.pen_cansplice": "{{ pen_cansplice }}",
 	"{{ project_name }}.pen_noncansplice": "{{ pen_noncansplice }}",
 	"{{ project_name }}.pen_intronlen": "{{ pen_intronlen }}",
@@ -56,10 +55,6 @@
 	"{{ project_name }}.screen_ref_dir": "{{ screen_ref_dir }}",
 	"{{ project_name }}.fastq_screen_conf": "{{ fastq_screen_conf }}",
 	"{{ project_name }}.fastqscreen_disk_size": "{{ fastqscreen_disk_size }}",
-	"{{ project_name }}.ref_dir": "{{ ref_dir }}",
-	"{{ project_name }}.multiqc_cluster_config": "{{ multiqc_cluster_config }}",
-	"{{ project_name }}.multiqc_docker": "{{ multiqc_docker }}",
-	"{{ project_name }}.multiqc_disk_size": "{{ multiqc_disk_size }}",
 	"{{ project_name }}.ballgown_docker": "{{ ballgown_docker }}",
 	"{{ project_name }}.ballgown_cluster": "{{ ballgown_cluster }}",
 	"{{ project_name }}.disk_size": "{{ disk_size if disk_size != '' else 200}}"
