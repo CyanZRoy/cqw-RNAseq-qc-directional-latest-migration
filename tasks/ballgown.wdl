@@ -17,13 +17,13 @@ task ballgown {
 		}
 		trap copy_task_logs EXIT
 
-		mkdir -p "$local_work/tmp" "$local_work/input"
+		mkdir -p "$local_work/tmp" "$local_work/input/${sample_id}"
 		export TMPDIR="$local_work/tmp"
 		export TMP="$TMPDIR"
 		export TEMP="$TMPDIR"
-		cp -f ${sep=" " ballgown} "$local_work/input/"
+		cp -f ${sep=" " ballgown} "$local_work/input/${sample_id}/"
 		cd "$local_work"
-		ballgown "$local_work/input" ${sample_id}.txt
+		ballgown "$local_work/input/${sample_id}" ${sample_id}.txt
 		cp -f ${sample_id}.txt "$call_dir/"
     >>>
     
